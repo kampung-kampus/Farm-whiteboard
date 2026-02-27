@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="en-SG">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plot Information | Educational Farm</title>
+    <style>
+        /* CSS Section */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f0;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 450px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        header h1 {
+            color: #2e7d32;
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        #image-container img {
+            width: 100%;
+            border-radius: 15px;
+            height: 250px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+        .info-card {
+            margin-top: 20px;
+            padding: 15px;
+            border-left: 6px solid #4CAF50;
+            background: #f9fdf9;
+            border-radius: 0 10px 10px 0;
+        }
+        h3 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            letter-spacing: 1px;
+        }
+        p {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+        .highlight {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1b5e20;
+        }
+        .loading { text-align: center; color: #888; padding: 50px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="loading-state" class="loading">Finding Plot Details...</div>
+        
+        <div id="content" style="display:none;">
+            <header>
+                <h1 id="veg-name">Vegetable Name</h1>
+            </header>
+            
+            <div id="image-container">
+                <img id="veg-image" src="" alt="Farm Vegetable">
+            </div>
+            
+            <div class="info-card">
+                <h3>Days Until Harvest</h3>
+                <p id="countdown" class="highlight">--</p>
+            </div>
+
+            <div class="info-card">
+                <h3>Common Uses</h3>
+                <p id="uses">--</p>
+            </div>
+
+            <div class="info-card">
+                <h3>Educational Fact</h3>
+                <p id="fact">--</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* JavaScript Section */
+        const WEB_APP_URL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
+
+        async function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const plotId = urlParams.get('id');
+
+            if (!plotId) {
+                document.getElementById('loading-state').innerText = "Error: No Plot ID found. Please scan a QR code.";
+                return;
+            }
+
+            try {
+                const response = await fetch(`${WEB_APP_URL}?id=${plotId}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    document.getElementById('loading-state').innerText = "Plot not found in system.";
+                    return;
+                }
+
+                // Fill data
+                document.getElementById('veg-name').innerText = data.name;
+                document.getElementById('uses').innerText = data.uses;
+                document.getElementById('fact').innerText = data.fact;
+                
+                // Image handling from your GitHub 'images' folder
+                // Data.image should be "images/kailan.jpg" in your Google Sheet
+                document.getElementById('veg-image').src = data.image;
+
+                // Harvest calculation
+                const harvestDate = new Date(data.harvest);
+                const today = new Date();
+                const diffTime = harvestDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                const countdownEl = document.getElementById('countdown');
+                if (diffDays > 0) {
+                    countdownEl.innerText = `${diffDays} Days to Harvest`;
+                } else if (diffDays === 0) {
+                    countdownEl.innerText = "Ready to Harvest Today!";
+                } else {
+                    countdownEl.innerText = "Harvest Period Active";
+                }
+
+                // Show content, hide loading
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading-state').innerText = "Connection error. Please try again.";
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
+ 
+
 
