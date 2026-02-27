@@ -1,0 +1,1 @@
+Farm-whiteboard is a digitized information board showing what plants are planted on what plots. It includes the scheduling of main tasks like germination, adding of manure, composting, harvesting, etc. It also provide information to staff and visitors through the scanning of QR codes.
